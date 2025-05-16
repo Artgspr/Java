@@ -64,35 +64,39 @@ public class UsuarioDAO {
         return usuarios;
     }
 
-    // Método para pesquisar usuários por nome ou login
-    public List<UsuarioDTO> pesquisarUsuarios(String termo) {
-        List<UsuarioDTO> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuario WHERE nome ILIKE ? OR login ILIKE ?";
+    // Método para pesquisar usuários por nome, email, senha ou login
+public List<UsuarioDTO> pesquisarUsuarios(String termo) {
+    List<UsuarioDTO> usuarios = new ArrayList<>();
+    String sql = "SELECT * FROM usuario WHERE nome ILIKE ? OR email ILIKE ? OR senha ILIKE ? OR login ILIKE ?";
 
-        try (Connection c = new Conexao().getConecta();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+    try (Connection c = new Conexao().getConecta();
+         PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + termo + "%");
-            ps.setString(2, "%" + termo + "%");
-            ResultSet rs = ps.executeQuery();
+        String likeTermo = "%" + termo + "%";
+        ps.setString(1, likeTermo);
+        ps.setString(2, likeTermo);
+        ps.setString(3, likeTermo);
+        ps.setString(4, likeTermo);
 
-            while (rs.next()) {
-                UsuarioDTO usuario = new UsuarioDTO(
-                        rs.getString("nome"),
-                        rs.getString("email"),
-                        rs.getString("senha"),
-                        rs.getString("login")
-                );
-                usuario.setId(rs.getInt("id"));
-                usuarios.add(usuario);
-            }
+        ResultSet rs = ps.executeQuery();
 
-        } catch (SQLException ex) {
-            logger.log(Level.SEVERE, "Erro ao pesquisar usuários", ex);
+        while (rs.next()) {
+            UsuarioDTO usuario = new UsuarioDTO(
+                    rs.getString("nome"),
+                    rs.getString("email"),
+                    rs.getString("senha"),
+                    rs.getString("login")
+            );
+            usuario.setId(rs.getInt("id"));
+            usuarios.add(usuario);
         }
 
-        return usuarios;
+    } catch (SQLException ex) {
+        logger.log(Level.SEVERE, "Erro ao pesquisar usuários", ex);
     }
+
+    return usuarios;
+}
 
     // Método para atualizar informações do usuário
     public boolean atualizarUsuario(UsuarioDTO usuario) {

@@ -16,7 +16,7 @@ public class Conexao {
 
     static String stringconexao = "jdbc:postgresql://localhost:5432/BcMVC";
     static String usuario = "postgres";
-    static String senha = "postgres";
+    static String senha = "caraicarai";
 
     public Connection getConecta() {
         try {

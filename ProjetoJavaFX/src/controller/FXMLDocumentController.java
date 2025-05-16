@@ -1,4 +1,4 @@
-package projetojavafx;
+package controller;
 
 import java.net.URL;
 import java.util.List;
@@ -15,7 +15,7 @@ import model.dto.UsuarioDTO;
 
 public class FXMLDocumentController implements Initializable {
 
-    @FXML private Button btnCadastrar, btnPesquisar, btnExcluir, btnEditar;
+    @FXML private Button btnCadastrar, btnPesquisar, btnExcluir, btnEditar, btnLimpar;
     @FXML private TextField txtLogin, txtNome, txtEmail;
     @FXML private PasswordField pswdSenha;
     @FXML private TextArea txtPesquisar;
@@ -141,7 +141,8 @@ public class FXMLDocumentController implements Initializable {
     private void listarUsuarios() {
         tblUsuario.getItems().setAll(new UsuarioDAO().listarUsuarios());
     }
-
+    
+    @FXML
     private void limparCampos() {
         txtLogin.clear();
         txtNome.clear();
