@@ -3,145 +3,148 @@ package controller;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.dao.UsuarioDAO;
 import model.dto.UsuarioDTO;
 
 public class FXMLDocumentController implements Initializable {
 
-    @FXML private Button btnCadastrar, btnPesquisar, btnExcluir, btnEditar, btnLimpar;
     @FXML private TextField txtLogin, txtNome, txtEmail;
     @FXML private PasswordField pswdSenha;
     @FXML private TextArea txtPesquisar;
     @FXML private TableView<UsuarioDTO> tblUsuario;
     @FXML private TableColumn<UsuarioDTO, String> colLogin, colNome, colEmail;
+    
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        configurarTabela();
+        listarUsuarios();
+        configurarSelecaoTabela();
+    }
+
+    private void configurarTabela() {
         colLogin.setCellValueFactory(new PropertyValueFactory<>("login"));
         colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+    }
 
-        listarUsuarios();
-        
+    private void configurarSelecaoTabela() {
         tblUsuario.getSelectionModel().selectedItemProperty().addListener((obs, antigo, selecionado) -> {
-        if (selecionado != null) {
-            txtLogin.setText(selecionado.getLogin());
-            txtNome.setText(selecionado.getNome());
-            txtEmail.setText(selecionado.getEmail());
-            pswdSenha.setText(selecionado.getSenha());
-        }
-    });
+            if (selecionado != null) {
+                preencherCampos(selecionado);
+            }
+        });
     }
 
     @FXML
     private void cadastrar(ActionEvent event) {
-        if (camposVazios()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Campos obrigatórios", "Por favor, preencha todos os campos.");
-            return;
-        }
-
-        UsuarioDTO usuario = new UsuarioDTO(
-            txtNome.getText(),
-            txtEmail.getText(),
-            pswdSenha.getText(),
-            txtLogin.getText()
-        );
-
-        boolean sucesso = new UsuarioDAO().cadastrarUsuario(usuario);
-
-        if (sucesso) {
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Cadastro realizado", "Usuário cadastrado com sucesso.");
-            listarUsuarios();
-            limparCampos();
-        } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível cadastrar o usuário.");
+        try {
+            validarCampos();
+            UsuarioDTO usuario = criarUsuarioFromForm();
+            usuarioDAO.cadastrar(usuario);
+            mostrarMensagemSucesso("Cadastro realizado", "Usuário cadastrado com sucesso.");
+            atualizarListaELimparCampos();
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Campos obrigatórios", e.getMessage());
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível cadastrar o usuário: " + e.getMessage());
         }
     }
 
     @FXML
-    private void pesquisar(ActionEvent event) {
+    private void pesquisar(ActionEvent btnPesquisar) {
         String termo = txtPesquisar.getText().trim();
-        List<UsuarioDTO> usuarios;
-
-        if (termo.isEmpty()) {
-            usuarios = new UsuarioDAO().listarUsuarios();
-        } else {
-            usuarios = new UsuarioDAO().pesquisarUsuarios(termo);
-        }
-
+        List<UsuarioDTO> usuarios = termo.isEmpty() 
+            ? usuarioDAO.listarTodos() 
+            : usuarioDAO.pesquisar(termo);
         tblUsuario.getItems().setAll(usuarios);
     }
 
     @FXML
     private void excluir(ActionEvent event) {
         UsuarioDTO selecionado = tblUsuario.getSelectionModel().getSelectedItem();
-
         if (selecionado == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Nenhuma seleção", "Selecione um usuário para excluir.");
             return;
         }
 
-        Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacao.setTitle("Confirmação");
-        confirmacao.setHeaderText(null);
-        confirmacao.setContentText("Tem certeza que deseja excluir este usuário?");
-        
-        confirmacao.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                boolean sucesso = new UsuarioDAO().removerUsuario(selecionado.getId());
-
-                if (sucesso) {
-                    mostrarAlerta(Alert.AlertType.INFORMATION, "Exclusão concluída", "Usuário excluído com sucesso.");
-                    listarUsuarios();
-                    limparCampos();
-                } else {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível excluir o usuário.");
-                }
+        mostrarConfirmacao("Confirmação", "Tem certeza que deseja excluir este usuário?", () -> {
+            try {
+                usuarioDAO.remover(selecionado.getId());
+                mostrarMensagemSucesso("Exclusão concluída", "Usuário excluído com sucesso.");
+                atualizarListaELimparCampos();
+            } catch (Exception e) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível excluir o usuário: " + e.getMessage());
             }
         });
     }
 
     @FXML
     private void editar(ActionEvent event) {
-        UsuarioDTO selecionado = tblUsuario.getSelectionModel().getSelectedItem();
-
-        if (selecionado == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Nenhuma seleção", "Selecione um usuário para editar.");
-            return;
+        try {
+            UsuarioDTO selecionado = tblUsuario.getSelectionModel().getSelectedItem();
+            if (selecionado == null) {
+                throw new IllegalArgumentException("Selecione um usuário para editar.");
+            }
+            
+            validarCampos();
+            atualizarUsuarioFromForm(selecionado);
+            usuarioDAO.atualizar(selecionado);
+            mostrarMensagemSucesso("Atualização realizada", "Usuário atualizado com sucesso.");
+            atualizarListaELimparCampos();
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Atenção", e.getMessage());
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível atualizar o usuário: " + e.getMessage());
         }
+    }
 
-        if (camposVazios()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Campos obrigatórios", "Preencha todos os campos para editar.");
-            return;
+    // Métodos auxiliares
+    private void validarCampos() {
+        if (txtLogin.getText().isEmpty() || txtNome.getText().isEmpty() || 
+            txtEmail.getText().isEmpty() || pswdSenha.getText().isEmpty()) {
+            throw new IllegalArgumentException("Por favor, preencha todos os campos.");
         }
+    }
 
-        selecionado.setLogin(txtLogin.getText());
-        selecionado.setNome(txtNome.getText());
-        selecionado.setEmail(txtEmail.getText());
-        selecionado.setSenha(pswdSenha.getText());
+    private UsuarioDTO criarUsuarioFromForm() {
+        return new UsuarioDTO(
+            txtNome.getText(),
+            txtEmail.getText(),
+            pswdSenha.getText(),
+            txtLogin.getText()
+        );
+    }
 
-        boolean sucesso = new UsuarioDAO().atualizarUsuario(selecionado);
+    private void atualizarUsuarioFromForm(UsuarioDTO usuario) {
+        usuario.setLogin(txtLogin.getText());
+        usuario.setNome(txtNome.getText());
+        usuario.setEmail(txtEmail.getText());
+        usuario.setSenha(pswdSenha.getText());
+    }
 
-        if (sucesso) {
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Atualização realizada", "Usuário atualizado com sucesso.");
-            listarUsuarios();
-            limparCampos();
-        } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível atualizar o usuário.");
-        }
+    private void preencherCampos(UsuarioDTO usuario) {
+        txtLogin.setText(usuario.getLogin());
+        txtNome.setText(usuario.getNome());
+        txtEmail.setText(usuario.getEmail());
+        pswdSenha.setText(usuario.getSenha());
     }
 
     private void listarUsuarios() {
-        tblUsuario.getItems().setAll(new UsuarioDAO().listarUsuarios());
+        tblUsuario.getItems().setAll(usuarioDAO.listarTodos());
     }
-    
+
+    private void atualizarListaELimparCampos() {
+        listarUsuarios();
+        limparCampos();
+    }
+
     @FXML
     private void limparCampos() {
         txtLogin.clear();
@@ -150,11 +153,20 @@ public class FXMLDocumentController implements Initializable {
         pswdSenha.clear();
     }
 
-    private boolean camposVazios() {
-        return txtLogin.getText().isEmpty() ||
-               txtNome.getText().isEmpty() ||
-               txtEmail.getText().isEmpty() ||
-               pswdSenha.getText().isEmpty();
+    private void mostrarMensagemSucesso(String titulo, String mensagem) {
+        mostrarAlerta(Alert.AlertType.INFORMATION, titulo, mensagem);
+    }
+
+    private void mostrarConfirmacao(String titulo, String mensagem, Runnable acaoConfirmacao) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                acaoConfirmacao.run();
+            }
+        });
     }
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensagem) {
