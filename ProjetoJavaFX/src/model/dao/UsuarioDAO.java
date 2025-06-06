@@ -117,7 +117,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Métodos auxiliares
     private void validarUsuario(UsuarioDTO usuario) throws IllegalArgumentException {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não pode ser nulo");

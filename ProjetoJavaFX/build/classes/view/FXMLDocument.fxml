@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="FXMLDocument" prefHeight="710.0" prefWidth="744.0" style="-fx-background-color: #E3F2FD;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projetojavafx.FXMLDocumentController">
+<AnchorPane fx:id="FXMLDocument" prefHeight="710.0" prefWidth="744.0" style="-fx-background-color: #E3F2FD;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.FXMLDocumentController">
    <children>
 
       <!-- Tabela de Usuários -->
@@ -120,7 +120,7 @@
                   <Font name="Arial" size="20.0" />
                </font>
             </Button>
-            <Button fx:id="btnLimpar" mnemonicParsing="false" onAction="#limparCampos" prefHeight="37.0" prefWidth="219.0" style="-fx-background-color: #f3c363;" text="Limpar" textAlignment="CENTER" textFill="#333333" GridPane.columnIndex="3">
+            <Button fx:id="btnLimpar" mnemonicParsing="false" onAction="#limparFormularioUsuario" prefHeight="37.0" prefWidth="219.0" style="-fx-background-color: #f3c363;" text="Limpar" textAlignment="CENTER" textFill="#333333" GridPane.columnIndex="3">
                <font>
                   <Font name="Arial" size="20.0" />
                </font>
@@ -151,7 +151,7 @@
                   <Font name="Arial" size="20.0" />
                </font>
             </Button>
-            <TextField fx:id="txtEmail1" prefHeight="37.0" prefWidth="417.0" promptText="Digite o email" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <TextField fx:id="txtPesquisar" prefHeight="37.0" prefWidth="417.0" promptText="Digite algum campo" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <font>
                   <Font name="Arial" size="20.0" />
                </font>

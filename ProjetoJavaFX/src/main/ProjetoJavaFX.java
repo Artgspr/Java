@@ -17,17 +17,26 @@ import javafx.stage.Stage;
 public class ProjetoJavaFX extends Application {
     
     @Override
-    public void start(Stage stage) throws Exception {
-       FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/view/FXMLDocument.fxml"));
+public void start(Stage stage) throws Exception {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/FXMLDocument.fxml"));
+        
+        if (loader.getLocation() == null) {
+            throw new RuntimeException("Arquivo FXML não encontrado em: /controller/FXMLDocument.fxml");
+        }
+        
         Parent root = loader.load();
-
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
+        stage.setTitle("Sistema de Usuários");
         stage.show();
+    } catch (Exception e) {
+        System.err.println("Erro ao carregar FXML: " + e.getMessage());
+        e.printStackTrace();
+        throw e;
     }
-
+}
     /**
      * @param args the command line arguments
      */

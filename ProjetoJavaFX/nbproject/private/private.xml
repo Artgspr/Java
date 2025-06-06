@@ -5,7 +5,7 @@
             <url>src/controller/FXMLDocumentController.java</url>
             <bookmark id="1">
                 <name/>
-                <line>166</line>
+                <line>171</line>
                 <key/>
             </bookmark>
         </file>
@@ -18,6 +18,7 @@
             <file>file:/C:/Users/ra2357041/Documents/GitHub/Java/ProjetoJavaFX/src/model/dao/UsuarioDAO.java</file>
             <file>file:/C:/Users/ra2357041/Documents/GitHub/Java/ProjetoJavaFX/src/controller/FXMLDocumentController.java</file>
             <file>file:/C:/Users/ra2357041/Documents/GitHub/Java/ProjetoJavaFX/src/util/DialogUtil.java</file>
+            <file>file:/C:/Users/ra2357041/Documents/GitHub/Java/ProjetoJavaFX/src/view/FXMLDocument.fxml</file>
         </group>
     </open-files>
 </project-private>

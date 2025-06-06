@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.dao.UsuarioDAO;
 import model.dto.UsuarioDTO;
+import util.DialogUtil;
 
 public class FXMLDocumentController implements Initializable {
 
@@ -37,25 +38,25 @@ public class FXMLDocumentController implements Initializable {
     private void configurarSelecaoTabela() {
         tblUsuario.getSelectionModel().selectedItemProperty().addListener((obs, antigo, selecionado) -> {
             if (selecionado != null) {
-                preencherCampos(selecionado);
+                preencherFormularioUsuario(selecionado);
             }
         });
     }
 
     @FXML
     private void cadastrar(ActionEvent event) {
-        try {
-            validarCampos();
-            UsuarioDTO usuario = criarUsuarioFromForm();
-            usuarioDAO.cadastrar(usuario);
-            mostrarMensagemSucesso("Cadastro realizado", "Usuário cadastrado com sucesso.");
-            atualizarListaELimparCampos();
-        } catch (IllegalArgumentException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Campos obrigatórios", e.getMessage());
-        } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível cadastrar o usuário: " + e.getMessage());
-        }
+    try {
+        validarCampos();
+        UsuarioDTO usuario = criarUsuarioFromForm();
+        usuarioDAO.cadastrar(usuario);
+        DialogUtil.showInformation("Cadastro realizado", "Usuário cadastrado com sucesso.");
+        atualizarListaELimparCampos();
+    } catch (IllegalArgumentException e) {
+        DialogUtil.showWarning("Campos obrigatórios", e.getMessage());
+    } catch (Exception e) {
+        DialogUtil.showError("Erro", "Não foi possível cadastrar o usuário: " + e.getMessage());
     }
+}
 
     @FXML
     private void pesquisar(ActionEvent btnPesquisar) {
@@ -70,40 +71,45 @@ public class FXMLDocumentController implements Initializable {
     private void excluir(ActionEvent event) {
         UsuarioDTO selecionado = tblUsuario.getSelectionModel().getSelectedItem();
         if (selecionado == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Nenhuma seleção", "Selecione um usuário para excluir.");
+            DialogUtil.showWarning("Nenhuma seleção", "Selecione um usuário para excluir.");
             return;
         }
 
-        mostrarConfirmacao("Confirmação", "Tem certeza que deseja excluir este usuário?", () -> {
+        boolean confirmado = DialogUtil.showConfirmation("Confirmação", 
+            "Tem certeza que deseja excluir este usuário?");
+    
+        if (confirmado) {
             try {
                 usuarioDAO.remover(selecionado.getId());
-                mostrarMensagemSucesso("Exclusão concluída", "Usuário excluído com sucesso.");
+                DialogUtil.showInformation("Exclusão concluída", "Usuário excluído com sucesso.");
                 atualizarListaELimparCampos();
             } catch (Exception e) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível excluir o usuário: " + e.getMessage());
+                DialogUtil.showError("Erro", "Não foi possível excluir o usuário: " + e.getMessage());
             }
-        });
+        }
     }
 
+// No método editar
     @FXML
     private void editar(ActionEvent event) {
         try {
             UsuarioDTO selecionado = tblUsuario.getSelectionModel().getSelectedItem();
             if (selecionado == null) {
-                throw new IllegalArgumentException("Selecione um usuário para editar.");
+                DialogUtil.showWarning("Atenção", "Selecione um usuário para editar.");
+                return;
             }
-            
+        
             validarCampos();
             atualizarUsuarioFromForm(selecionado);
             usuarioDAO.atualizar(selecionado);
-            mostrarMensagemSucesso("Atualização realizada", "Usuário atualizado com sucesso.");
+            DialogUtil.showInformation("Atualização realizada", "Usuário atualizado com sucesso.");
             atualizarListaELimparCampos();
         } catch (IllegalArgumentException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção", e.getMessage());
+            DialogUtil.showWarning("Atenção", e.getMessage());
         } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível atualizar o usuário: " + e.getMessage());
+            DialogUtil.showError("Erro", "Não foi possível atualizar o usuário: " + e.getMessage());
         }
-    }
+    }   
 
     // Métodos auxiliares
     private void validarCampos() {
@@ -129,7 +135,7 @@ public class FXMLDocumentController implements Initializable {
         usuario.setSenha(pswdSenha.getText());
     }
 
-    private void preencherCampos(UsuarioDTO usuario) {
+    private void preencherFormularioUsuario(UsuarioDTO usuario) {
         txtLogin.setText(usuario.getLogin());
         txtNome.setText(usuario.getNome());
         txtEmail.setText(usuario.getEmail());
@@ -142,11 +148,11 @@ public class FXMLDocumentController implements Initializable {
 
     private void atualizarListaELimparCampos() {
         listarUsuarios();
-        limparCampos();
+        limparFormularioUsuario();
     }
 
     @FXML
-    private void limparCampos() {
+    private void limparFormularioUsuario() {
         txtLogin.clear();
         txtNome.clear();
         txtEmail.clear();
