@@ -20,7 +20,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML private TableView<UsuarioDTO> tblUsuario;
     @FXML private TableColumn<UsuarioDTO, String> colLogin, colNome, colEmail;
     
-    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private static final Logger LOGGER = Logger.getLogger(FXMLDocumentController.class.getName());
+    private final UsuarioValidator usuarioValidator = new UsuarioValidator();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
