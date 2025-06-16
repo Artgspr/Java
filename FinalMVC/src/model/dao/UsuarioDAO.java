@@ -26,10 +26,10 @@ public class UsuarioDAO {
             ps.setString(3, usuario.getSenha());
             ps.setString(4, usuario.getLogin());
             ps.execute();
-            DialogUtil.mostrarSucesso("O Usuário " + usuario.getNome() + "foicadastrado com sucesso!");
+            //DialogUtil.mostrarSucesso("O Usuário " + usuario.getNome() + " foi cadastrado com sucesso!");
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Erro ao cadastrar usuário", e);
-            DialogUtil.mostrarErro("Erro ao cadastrar usuário no banco de dados.");
+            //LOGGER.log(Level.SEVERE, "Erro ao cadastrar usuário", e);
+            //DialogUtil.mostrarErro("Erro ao cadastrar usuário no banco de dados.");
         }
     }
 
@@ -50,8 +50,8 @@ public class UsuarioDAO {
                 usuarios.add(usuario);
             }
         } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, "Erro ao listar usuários", ex);
-            DialogUtil.mostrarErro("Erro ao listar usuários.");
+            //LOGGER.log(Level.SEVERE, "Erro ao listar usuários", ex);
+            //DialogUtil.mostrarErro("Erro ao listar usuários.");
         }
         return usuarios;
     }
@@ -76,8 +76,8 @@ public class UsuarioDAO {
                 usuarios.add(usuario);
             }
         } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, "Erro ao pesquisar usuários", ex);
-            DialogUtil.mostrarErro("Erro ao pesquisar usuários.");
+           // LOGGER.log(Level.SEVERE, "Erro ao pesquisar usuários", ex);
+            //DialogUtil.mostrarErro("Erro ao pesquisar usuários.");
         }
         return usuarios;
     }
@@ -88,10 +88,10 @@ public class UsuarioDAO {
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-            DialogUtil.mostrarSucesso("Usuário " + id + " excluído com sucesso!");
+            //DialogUtil.mostrarSucesso("Usuário " + id + " excluído com sucesso!");
         } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, "Erro ao excluir usuário com ID: " + id, ex);
-            DialogUtil.mostrarErro("Erro ao excluir usuário.");
+            //LOGGER.log(Level.SEVERE, "Erro ao excluir usuário com ID: " + id, ex);
+            //DialogUtil.mostrarErro("Erro ao excluir usuário.");
         }
     }
 
@@ -106,10 +106,10 @@ public class UsuarioDAO {
             ps.setString(4, usuario.getLogin());
             ps.setInt(5, usuario.getId());
             ps.executeUpdate();
-            DialogUtil.mostrarSucesso("Usuário atualizado com sucesso!");
+            //DialogUtil.mostrarSucesso("Usuário atualizado com sucesso!");
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Erro ao atualizar usuário com nome: " + usuario.getNome(), e);
-            DialogUtil.mostrarErro("Erro ao atualizar usuário.");
+            //LOGGER.log(Level.SEVERE, "Erro ao atualizar usuário com nome: " + usuario.getNome(), e);
+            //DialogUtil.mostrarErro("Erro ao atualizar usuário.");
         }
     }
 }

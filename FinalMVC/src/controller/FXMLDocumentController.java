@@ -13,10 +13,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.dto.UsuarioDTO;
 import util.DialogUtil;
-import validator.UsuarioValidator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.PasswordField;
+import validator.IUsuarioValidator;
 
 
 public class FXMLDocumentController implements Initializable {
@@ -27,7 +27,11 @@ public class FXMLDocumentController implements Initializable {
     @FXML private TableColumn<UsuarioDTO, String> colLogin, colNome, colEmail;
 
     private static final Logger LOGGER = Logger.getLogger(FXMLDocumentController.class.getName());
-    private final UsuarioValidator usuarioValidator = new UsuarioValidator();
+    private IUsuarioValidator usuarioValidator;
+    
+    public void setUsuarioValitor(IUsuarioValidator usuarioValidator) {
+        this.usuarioValidator = usuarioValidator;
+    }
 
     @FXML
     private void cadastrar(ActionEvent event) {
@@ -38,7 +42,6 @@ public class FXMLDocumentController implements Initializable {
                 txtLogin.getText()
         );
 
-        // depois valida cada campo
         if (!usuarioValidator.validar(objUsuarioDTO)) {
             DialogUtil.mostrarAviso(usuarioValidator.obterMensagemErro());
             return;
@@ -65,9 +68,9 @@ public class FXMLDocumentController implements Initializable {
         List<UsuarioDTO> usuarios;
 
         try {
-            if (!UsuarioValidator.validarTermoPesquisa(termo)) {
-                DialogUtil.mostrarAviso("Digite um termo (nome ou login) válido para pesquisar");
-                return;
+            if (!usuarioValidator.validarTermoPesquisa(termo)) {
+                //DialogUtil.mostrarAviso("Digite um termo (nome ou login) válido para pesquisar");
+                listarUsuarios();
             }
 
             usuarios = new UsuarioDAO().pesquisarUsuarios(termo);
@@ -83,13 +86,11 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void editar(ActionEvent event) {
         UsuarioDTO usuarioSelecionado = obterUsuarioSelecionado();
-        //UsuarioDTO usuarioSelecionado = tblUsuario.getSelectionModel().getSelectedItem();
 
         if (usuarioSelecionado != null) {
             boolean confirmarAlteracao = DialogUtil.mostrarConfirmacao("Confirmação", "Você deseja realmente alterar os dados deste usuário?");
 
             if (confirmarAlteracao) {
-                // atualiza os dados com os campos preenchidos na interface
                 usuarioSelecionado.setLogin(txtLogin.getText());
                 usuarioSelecionado.setNome(txtNome.getText());
                 usuarioSelecionado.setEmail(txtEmail.getText());
@@ -129,7 +130,6 @@ public class FXMLDocumentController implements Initializable {
                     limparCampos();
                     DialogUtil.mostrarSucesso("Usuário excluído com sucesso!");
                 } catch (Exception e) {
-                    //vai exibir uma mensagem de erro caso tenha algum erro
                     LOGGER.log(Level.SEVERE, "Erro ao excluir usuário", e);
                     DialogUtil.mostrarErro("Erro ao excluir usuário: " + e.getMessage());
                 }
@@ -152,7 +152,6 @@ public class FXMLDocumentController implements Initializable {
         tblUsuario.getSelectionModel().clearSelection();
     }
 
-    //método para obter o usuário selecionado
     private UsuarioDTO obterUsuarioSelecionado() {
         return tblUsuario.getSelectionModel().getSelectedItem();
     }
@@ -169,6 +168,7 @@ public class FXMLDocumentController implements Initializable {
                 txtLogin.setText(selecionado.getLogin());
                 txtNome.setText(selecionado.getNome());
                 txtEmail.setText(selecionado.getEmail());
+                pswdSenha.setText(selecionado.getSenha());
             }
         });
 

@@ -16,7 +16,7 @@ public class UsuarioValidator implements IUsuarioValidator {
         validadores.add(new SenhaValidador());
         validadores.add(new LoginValidador());
     }
-    
+
     @Override
     public boolean validar(UsuarioDTO usuario) {
         mensagensErro.clear();
@@ -24,13 +24,14 @@ public class UsuarioValidator implements IUsuarioValidator {
         Validador<UsuarioDTO> validadorCamposObrigatorios = validadores.get(0);
         if (!validadorCamposObrigatorios.validar(usuario)) {
             mensagensErro.add(validadorCamposObrigatorios.obterMensagemErro());
-            return false;  // se falhar, retorna false e não executa as outras validações
+            return false;  
         }
 
-        for (Validador<UsuarioDTO> validador : validadores) {
-            if (!validador.validar(usuario)) {
-                mensagensErro.add(validador.obterMensagemErro());
-            }
+        for (int i = 1; i < validadores.size(); i++) { 
+    Validador<UsuarioDTO> validador = validadores.get(i);
+    if (!validador.validar(usuario)) {
+        mensagensErro.add(validador.obterMensagemErro());
+    }
         }
 
         return mensagensErro.isEmpty();
