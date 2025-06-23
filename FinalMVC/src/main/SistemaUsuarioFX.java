@@ -20,7 +20,7 @@ public class SistemaUsuarioFX extends Application {
      @Override
     public void start(Stage stage) throws Exception {
         // Parent root = FXMLLoader.load(getClass().getResource("/finalmvc/view/FXMLDocument.fxml"));
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/finalmvc/view/FXMLDocument.fxml")); // barra inicial aqui!
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/FXMLDocument.fxml")); // barra inicial aqui!
         Parent root = loader.load();
         FXMLDocumentController controller = loader.getController();
         controller.setUsuarioValidator(new UsuarioValidator());
@@ -36,5 +36,5 @@ public class SistemaUsuarioFX extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }

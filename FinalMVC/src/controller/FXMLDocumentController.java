@@ -19,6 +19,7 @@ import javafx.scene.control.PasswordField;
 import validator.IUsuarioValidator;
 
 
+
 public class FXMLDocumentController implements Initializable {
 
     @FXML private TextField txtLogin, txtNome, txtEmail, txtPesquisar;
@@ -29,7 +30,7 @@ public class FXMLDocumentController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(FXMLDocumentController.class.getName());
     private IUsuarioValidator usuarioValidator;
     
-    public void setUsuarioValitor(IUsuarioValidator usuarioValidator) {
+    public void setUsuarioValidator(IUsuarioValidator usuarioValidator) {
         this.usuarioValidator = usuarioValidator;
     }
 
